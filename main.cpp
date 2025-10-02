@@ -1,18 +1,33 @@
 #include <iostream>
+#include <limits>
 #include "bank_customer.h"
 #include "buyer.h"
+#include "seller.h" 
 
 enum PrimaryPrompt{LOGIN, REGISTER, EXIT, ADMIN_LOGIN};
 enum RegisterPrompt{CREATE_BUYER, CREATE_SELLER, BACK};
+enum AdminPrompt{ACCOUNT_MANAGEMENT, SYSTEM_REPORT, ADMIN_LOGOUT};
+enum AccountMgmtPrompt{VIEW_ALL, VIEW_DETAILS, SEEK, CREATE_NEW, REMOVE_ACCOUNT, MGMT_BACK};
+
 using namespace std;
 
 int main() {
     //create a loop prompt 
     PrimaryPrompt prompt = LOGIN;
     RegisterPrompt regPrompt = CREATE_BUYER;
+    
+    // Variabel Declaration
+    AdminPrompt adminPrompt = ACCOUNT_MANAGEMENT; 
+    AccountMgmtPrompt acctMgmtPrompt = VIEW_ALL; 
     const string ADMIN_USERNAME = "root";
     const string ADMIN_PASSWORD = "toor";
-    string username, password;
+    string username, password; 
+
+    // Variabel for seeking/removing
+    string searchName;
+    int removeId;
+    int choice; 
+    string confirmation; 
 
     while (prompt != EXIT) {
         cout << "Select an option: " << endl;
@@ -20,10 +35,22 @@ int main() {
         cout << "2. Register" << endl;
         cout << "3. Exit" << endl;
         cout << "4. Admin Login" << endl;
-        int choice;
-        cin >> choice;
-        prompt = static_cast<PrimaryPrompt>(choice - 1);
-        switch (prompt) {
+        
+        // Checking input in main menu
+        if (!(cin >> choice)) {
+            cout << "Input tidak valid. Silakan coba lagi." << endl;
+            cin.clear(); 
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue; 
+        }
+        
+        if (choice < 1 || choice > 4) {
+            cout << "Pilihan tidak valid." << endl;
+            continue; 
+        }
+
+        prompt = static_cast<PrimaryPrompt>(choice - 1); 
+        switch (prompt) { 
             case LOGIN:
                 cout << "Login selected." << endl;
                 /* if Login is selected, based on authority then provide options:
@@ -76,7 +103,7 @@ int main() {
                 extra functions
                 9. Exit to main Menu
                 10. Exit Program
-                **/
+                */
                 break;
             case REGISTER:
                 regPrompt = CREATE_BUYER; // reset regPrompt to CREATE_BUYER when entering register menu
@@ -87,7 +114,17 @@ int main() {
                     cout << "2. Create Seller Account" << endl;
                     cout << "3. Back" << endl;
                     int regChoice;
-                    cin >> regChoice;
+                    // Error check for inner loop input
+                    if (!(cin >> regChoice)) {
+                        cout << "Input tidak valid. Silakan coba lagi." << endl;
+                        cin.clear();
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        continue;
+                    }
+                    if (regChoice < 1 || regChoice > 3) {
+                        cout << "Pilihan tidak valid." << endl;
+                        continue;
+                    }
                     regPrompt = static_cast<RegisterPrompt>(regChoice - 1);
                     switch (regPrompt) {
                         case CREATE_BUYER:
@@ -100,7 +137,7 @@ int main() {
                             cout << "Back selected." << endl;
                             break;
                         default:
-                            cout << "Invalid option." << endl;
+                            cout << "Invalid option." << endl; 
                             break;
                     }
                 }
@@ -123,17 +160,136 @@ int main() {
                 cin >> username;
                 cout << "Password: ";
                 cin >> password;
-                /** After login create a sub prompt that provides the following features
-                1. Account Management
-                    - View All Buyers, Sellers
-                    - View All details of Buyers, Sellers
-                    - Seek certain buyer of seller based on Name / account Id / address / phone number
-                    - Create new buyer/seller/Bank account
-                    - Remove buyer/seller based on ID (all related info will be deleted)
-                2. System Report
-                    - Total number of Buyers, Sellers
-                    - Total number of Banking Accounts
-                */
+                
+                // Check for root login
+                if (username == ADMIN_USERNAME && password == ADMIN_PASSWORD) {
+                    cout << "Admin Login successful. Welcome, Root!" << endl;
+                    adminPrompt = ACCOUNT_MANAGEMENT; // Reset admin prompt for loop
+
+                    // Sub prompt for User related function
+                    while (adminPrompt != ADMIN_LOGOUT) { 
+                        cout << "\n--- Admin Menu ---" << endl;
+                        cout << "Select an Admin option: " << endl;
+                        cout << "1. Account Management" << endl;
+                        cout << "2. System Report" << endl;
+                        cout << "3. Logout (Return to Main Menu)" << endl;
+                        int adminChoice;
+                        
+                        // main menu input check
+                        if (!(cin >> adminChoice)) {
+                            cout << "Input tidak valid. Silakan coba lagi." << endl;
+                            cin.clear();
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                            continue;
+                        }
+                        if (adminChoice < 1 || adminChoice > 3) {
+                            cout << "Pilihan Admin tidak valid." << endl;
+                            continue;
+                        }
+                        
+                        adminPrompt = static_cast<AdminPrompt>(adminChoice - 1);
+
+                        switch (adminPrompt) {
+                            case ACCOUNT_MANAGEMENT:
+                                cout << "Account Management selected." << endl;
+                                acctMgmtPrompt = VIEW_ALL; // Reset management prompt
+                                
+                                // Sub-loop untuk Account Management
+                                while (acctMgmtPrompt != MGMT_BACK) {
+                                    cout << "\n--- Account Management Menu ---" << endl;
+                                    cout << "1. View All Buyers, Sellers" << endl;
+                                    cout << "2. View All details of Buyers, Sellers" << endl;
+                                    cout << "3. Seek certain buyer of seller based on Name / account Id / address / phone number" << endl;
+                                    cout << "4. Create new buyer/seller/Bank account" << endl;
+                                    cout << "5. Remove buyer/seller based on ID (all related info will be deleted)" << endl;
+                                    cout << "6. Back to Admin Menu" << endl;
+                                    int acctMgmtChoice;
+                                    
+                                    // Pengecekan input Account Management
+                                    if (!(cin >> acctMgmtChoice)) {
+                                        cout << "Input tidak valid. Silakan coba lagi." << endl;
+                                        cin.clear();
+                                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                                        continue; 
+                                    }
+                                    if (acctMgmtChoice < 1 || acctMgmtChoice > 6) {
+                                        cout << "Pilihan Manajemen Akun tidak valid." << endl;
+                                        continue;
+                                    }
+                                    
+                                    acctMgmtPrompt = static_cast<AccountMgmtPrompt>(acctMgmtChoice - 1);
+                                    
+                                    switch (acctMgmtPrompt) {
+                                        case VIEW_ALL:
+                                            // View All Buyers, Sellers
+                                            cout << "Viewing all Buyers and Sellers (Placeholder)." << endl;
+                                            break;
+                                        case VIEW_DETAILS:
+                                            // View All details of Buyers, Sellers
+                                            cout << "Viewing all details of Buyers and Sellers (Placeholder)." << endl;
+                                            break;
+                                        case SEEK:
+                                            // Seek certain buyer of seller based on Name / account Id / address / phone number
+                                            cout << "Seek certain buyer or seller." << endl;
+                                            cout << "Enter Name, ID, Address, Phone, or Email to search (Placeholder): ";
+                                            cin >> searchName; 
+                                            cout << "Searching for account: " << searchName << " (Placeholder)." << endl;
+                                            break;
+                                        case CREATE_NEW:
+                                            // Create new buyer/seller/Bank account
+                                            cout << "Creating new account (Placeholder)." << endl;
+                                            break;
+                                        case REMOVE_ACCOUNT:
+                                            // Remove buyer/seller based on ID (all related info will be deleted)
+                                            cout << "Enter ID of Buyer/Seller to remove (Placeholder): ";
+                                            
+                                            if (!(cin >> removeId)) {
+                                                cout << "Input ID tidak valid. Pembatalan penghapusan." << endl;
+                                                cin.clear();
+                                                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                                                break;
+                                            }
+
+                                            cout << "Confirm removal of account with ID " << removeId << "? All related data will be deleted (Y/N): ";
+                                            cin >> confirmation; 
+                                            if (confirmation == "Y" || confirmation == "y") {
+                                                cout << "Account with ID " << removeId << " and related info deleted (Placeholder)." << endl;
+                                            } else {
+                                                cout << "Removal cancelled." << endl;
+                                            }
+                                            break;
+                                        case MGMT_BACK:
+                                            cout << "Returning to Admin Menu." << endl;
+                                            break;
+                                        default:
+                                            cout << "Invalid Account Management option." << endl;
+                                            break;
+                                    }
+                                }
+                                break;
+                            case SYSTEM_REPORT:
+                                cout << "System Report selected (Placeholder)." << endl;
+                                /*
+                                2. System Report
+                                    - Total number of Buyers, Sellers
+                                    - Total number of Banking Accounts
+                                */
+                                cout << "Total number of Buyers: N/A" << endl;
+                                cout << "Total number of Sellers: N/A" << endl;
+                                cout << "Total number of Banking Accounts: N/A" << endl;
+                                break;
+                            case ADMIN_LOGOUT:
+                                cout << "Logging out of Admin account. Returning to Main Menu." << endl;
+                                break;
+                            default:
+                                cout << "Invalid Admin option." << endl;
+                                break;
+                        }
+                    } 
+
+                } else {
+                    cout << "Login failed. Invalid username or password." << endl;
+                }
                 break;
             default:
                 cout << "Invalid option." << endl;
